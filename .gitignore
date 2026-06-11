@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Resultados del entrenamiento
+historial_entrenamiento.csv
+predicciones_test.csv
+metricas_red_neuronal.json
+matriz_confusion.csv
+modelo_red_neuronal_conaset.keras
