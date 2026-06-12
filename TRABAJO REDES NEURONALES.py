@@ -1,23 +1,42 @@
 """
-Evaluacion 2 - Fundamentos de Data Science
-Tema: Redes Neuronales y limpieza de datos con fuente CONASET
+TRABAJO DE REDES NEURONALES Y MODELOS PREDICTIVOS DATA SCIENCE
+Tema: Seguridad Vial - CONASET
 
-Este trabajo usa el mismo Excel oficial de CONASET trabajado en la evaluacion
-anterior, pero ahora se aplica una red neuronal MLP para predecir siniestros.
+Este trabajo implementa modelos predictivos clasicos (Regresion Lineal,
+Regresion Multiple, Random Forest) y una Red Neuronal MLP para predecir
+la cantidad de siniestros viales en Chile, utilizando datos oficiales
+del Observatorio de CONASET (2000-2024).
 
 Fuente principal:
-https://www.conaset.cl/programa/observatorio-datos-estadistica/biblioteca-observatorio/estadisticas-generales/
+  https://www.conaset.cl/programa/observatorio-datos-estadistica/
+  biblioteca-observatorio/estadisticas-generales/
+  Archivo: Regionesdeocurrencia2000-2024.xlsx
 
-Fuente secundaria de validacion:
-https://mapas-conaset.opendata.arcgis.com
+Fuente secundaria (validacion):
+  https://mapas-conaset.opendata.arcgis.com
+
+Integrantes: Rigo Vega, Martin Caamaño, Favio Muñoz, Nikolas Maldonado.
 """
 import os
 import random
 import re
 import unicodedata
 import warnings
+
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import (
+    r2_score,
+    mean_squared_error,
+    mean_absolute_error,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+)
 warnings.filterwarnings("ignore")
 
 # ---------------------------------------------------------------------
