@@ -39,15 +39,37 @@ from sklearn.metrics import (
 )
 warnings.filterwarnings("ignore")
 
-# ---------------------------------------------------------------------
-# configuracion general
-# ---------------------------------------------------------------------
+# =====================================================================
+# CONFIGURACION GENERAL
+# =====================================================================
+
+# nombre del excel oficial de CONASET, debe estar en la misma carpeta
 ARCHIVO_EXCEL = "Regionesdeocurrencia2000-2024.xlsx"
+
+# cache en CSV para no reprocesar el excel cada vez que corremos el script
+CSV_CACHE = "datos_conaset.csv"
+
+# url de la API publica de CONASET para validar la fuente de datos
 API_CONASET = "https://mapas-conaset.opendata.arcgis.com/data.json"
+
+# semilla fija para que los resultados sean reproducibles
 RANDOM_STATE = 42
+
+# variable que queremos predecir
 TARGET = "siniestros"
-FEATURES_NUMERICAS = [
-    "anio",
+
+# features para regresion lineal simple: solo el año
+# la idea es ver si existe una tendencia temporal en los siniestros
+FEATURES_SIMPLE = ["año"]
+
+# features para regresion multiple y random forest
+# agregamos region, fallecidos y lesionados graves
+FEATURES_MULTI = ["año", "region_num", "fallecidos", "lesionados_graves"]
+
+# features para la red neuronal (necesita mas variables para aprovechar
+# la capacidad de aprendizaje de las capas densas)
+FEATURES_NUMERICAS_RED = [
+    "año",
     "region_num",
     "fallecidos",
     "lesionados_graves",
@@ -56,13 +78,40 @@ FEATURES_NUMERICAS = [
     "total_lesionados",
     "tasa_mortalidad",
     "tasa_lesionados_graves",
-    "siniestros_lag_1",
-    "siniestros_media_3",
-    "total_siniestros_chile_lag_1",
-    "periodo_post_pandemia",
+    "siniestros_lag_1",         # siniestros del año anterior
+    "siniestros_media_3",      # promedio movil 3 años anteriores
+    "total_siniestros_chile_lag_1",  # total pais del año anterior
+    "periodo_post_pandemia",   # flag binario >= 2021
 ]
-FEATURES_CATEGORICAS = ["region"]
-ULTIMOS_RESULTADOS = None
+FEATURES_CATEGORICAS_RED = ["region"]
+
+# paleta de colores para todos los graficos (misma en todo el trabajo)
+COLORES = {
+    "azul":    "#2563EB",
+    "rojo":    "#DC2626",
+    "verde":   "#16A34A",
+    "naranja": "#EA580C",
+    "gris":    "#6B7280",
+    "morado":  "#7C3AED",
+}
+
+# mapeo de regiones a numeros (fijo para que siempre sea el mismo)
+REGIONES_NUM = {
+    "Tarapacá": 1, "Antofagasta": 2, "Atacama": 3, "Coquimbo": 4,
+    "Valparaíso": 5, "L.B.O´Higgins": 6, "Maule": 7, "Biobio": 8,
+    "Araucanía": 9, "Los Lagos": 10, "Aysén": 11, "Magallanes": 12,
+    "Metropolitana": 13, "Los Ríos": 14, "Arica y Parinacota": 15, "Ñuble": 16,
+}
+
+# umbrales para clasificar siniestros en bajo/medio/alto
+# bajo: menos de 2000, medio: entre 2000 y 4500, alto: mas de 4500
+BINS_CATEGORIA = [0, 2000, 4500, float("inf")]
+LABELS_CATEGORIA = ["bajo", "medio", "alto"]
+
+# aqui guardamos los resultados de cada modelo a medida que se entrenan
+# al principio estan todos en None porque no se ha entrenado nada
+RESULTADOS_CLASICOS = {"simple": None, "multiple": None, "rf": None}
+RESULTADOS_RED = None
 
 # ---------------------------------------------------------------------
 # validacion de fuente
